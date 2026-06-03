@@ -12,6 +12,7 @@ BrowserAct-powered lead management. Finds prospects on LinkedIn, X/Twitter, and 
 This skill directory includes template files. They get installed alongside SKILL.md:
 - `leads.csv` — CSV header row
 - `icp-template.md` — ICP template with placeholder fields
+- `pipeline.html` — Rich HTML dashboard for visual pipeline tracking
 
 During setup, the agent reads these files and copies their content into `./glean-data/`.
 
@@ -39,7 +40,7 @@ mkdir -p ./glean-data/data ./glean-data/icp
 
 ### Step 3: Copy Bundled Templates
 
-Try to read `leads.csv` and `icp-template.md` from this skill's install directory. Check these locations (in order):
+Try to read `leads.csv`, `icp-template.md`, and `pipeline.html` from this skill's install directory. Check these locations (in order):
 - `.agents/skills/glean/`
 - `.opencode/skills/glean/`
 - `~/.config/opencode/skills/glean/`
@@ -50,6 +51,9 @@ Use the `read` tool on the first match. If none found, create inline:
 ```
 id,name,title,company,industry,linkedin_url,x_handle,email,stage,score,source,platform,tags,notes,first_contact,last_followup,next_followup
 ```
+
+**pipeline.html:**
+Read the content of `pipeline.html` from the skill directory and write it to `./glean-data/pipeline.html`.
 
 **icp-template.md** — use the template below and fill in answers after asking the user.
 
@@ -109,7 +113,11 @@ id,name,title,company,industry,linkedin_url,x_handle,email,stage,score,source,pl
 ```
 
 ### Step 7: Confirm
-"Glean is ready. I can find leads on LinkedIn, X/Twitter, or via Email — all tracked in your CSV. What would you like to do?"
+"Glean is ready. I can find leads on LinkedIn, X/Twitter, or via Email — all tracked in your CSV. 
+
+**Visual Dashboard:** You can view your pipeline at any time by opening `./glean-data/pipeline.html` in your browser.
+
+What would you like to do?"
 
 ## Manual Workflows
 
@@ -133,6 +141,13 @@ echo "X/Twitter: $(tail -n +2 ./glean-data/data/leads.csv | grep -c ',x,')"
 echo "Email: $(tail -n +2 ./glean-data/data/leads.csv | grep -c ',email,')"
 echo "Google Maps: $(tail -n +2 ./glean-data/data/leads.csv | grep -c ',gmaps,')"
 ```
+
+### Preview Pipeline (Visual)
+To view a rich dashboard of your leads:
+1. Open `./glean-data/pipeline.html` in your browser.
+2. If the browser blocks the local CSV (CORS error), either:
+   - Click "Select leads.csv" and pick `./glean-data/data/leads.csv`.
+   - OR run a local server: `cd glean-data && python3 -m http.server 8000` then visit `http://localhost:8000/pipeline.html`.
 
 ### Send Follow-Ups
 Read CSV for stage=contacted where last_followup > 3 days. Group by platform. For each lead, open platform and send follow-up. Respect Custom Instructions for max follow-ups.

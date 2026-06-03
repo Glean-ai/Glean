@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glean Pipeline Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #050810;
+            --bg-surface: #0a0e1a;
+            --text-primary: #f0f4ff;
+            --text-secondary: #8892a4;
+            --accent: #6b46c1;
+            --border: rgba(255, 255, 255, 0.05);
+            --font-sans: system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            padding: 2rem;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .title::before {
+            content: "⟩";
+            color: var(--accent);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .metric-title {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .table-container {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: lowercase;
+        }
+
+        .badge-discovered { background: rgba(136, 146, 164, 0.1); color: #8892a4; }
+        .badge-contacted { background: rgba(107, 70, 193, 0.1); color: #9f7aea; }
+        .badge-replied { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+        .badge-meeting_booked { background: rgba(16, 185, 129, 0.1); color: #34d399; }
+        .badge-converted { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .badge-dead { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+
+        .link {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .link:hover { text-decoration: underline; }
+
+        /* CORS Warning State */
+        #cors-warning {
+            display: none;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+            margin-top: 1rem;
+        }
+        .upload-btn:hover { background-color: #553c9a; }
+
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Glean Pipeline</h1>
+            <div>
+                <button id="refresh-btn" class="upload-btn" style="margin-top: 0; background-color: rgba(255,255,255,0.1);">Refresh Data</button>
+            </div>
+        </header>
+
+        <div id="cors-warning">
+            <h3>Local File Restriction (CORS) Detected</h3>
+            <p style="margin: 0.5rem 0; color: var(--text-secondary);">Browsers block reading local CSV files automatically when opened via <code>file://</code>.</p>
+            <p style="font-size: 0.9rem;">To fix this, either run a local server (<code>python3 -m http.server</code>) OR manually select your <code>leads.csv</code> file below:</p>
+            <input type="file" id="file-input" accept=".csv" />
+            <button class="upload-btn" onclick="document.getElementById('file-input').click()">Select leads.csv</button>
+        </div>
+
+        <div class="metrics" id="metrics-container">
+            <!-- Metrics injected via JS -->
+        </div>
+
+        <div class="table-container">
+            <table id="leads-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Title</th>
+                        <th>Company</th>
+                        <th>Platform</th>
+                        <th>Stage</th>
+                        <th>Last Followup</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr><td colspan="7" class="empty-state">Loading pipeline data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const CSV_PATH = './data/leads.csv';
+        
+        document.getElementById('refresh-btn').addEventListener('click', loadData);
+        
+        // Handle manual file upload (Fallback)
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    document.getElementById('cors-warning').style.display = 'none';
+                    renderDashboard(results.data);
+                }
+            });
+        });
+
+        function loadData() {
+            // Try fetching automatically
+            fetch(CSV_PATH)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(csvText => {
+                    Papa.parse(csvText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            renderDashboard(results.data);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.warn('Auto-fetch failed (likely CORS on file://). Showing manual upload.', error);
+                    document.getElementById('cors-warning').style.display = 'block';
+                    document.getElementById('table-body').innerHTML = `<tr><td colspan="7" class="empty-state">Please select your leads.csv file above to view data.</td></tr>`;
+                });
+        }
+
+        function renderDashboard(data) {
+            if (!data || data.length === 0) {
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="7" class="empty-state">No leads found in pipeline yet. Ask your agent to find some!</td></tr>`;
+                return;
+            }
+
+            // Calculate Metrics
+            const stages = { discovered: 0, contacted: 0, replied: 0, meeting_booked: 0, converted: 0 };
+            
+            let html = '';
+            data.forEach(lead => {
+                if (lead.stage && stages[lead.stage] !== undefined) {
+                    stages[lead.stage]++;
+                }
+                
+                // Build link
+                let platformLink = '';
+                if (lead.linkedin_url) platformLink = `<a href="${lead.linkedin_url}" target="_blank" class="link">Profile ↗</a>`;
+                else if (lead.x_handle) platformLink = `<a href="https://x.com/${lead.x_handle.replace('@', '')}" target="_blank" class="link">${lead.x_handle} ↗</a>`;
+                
+                const stageBadgeClass = lead.stage ? `badge-${lead.stage}` : 'badge-discovered';
+                
+                html += `
+                    <tr>
+                        <td>${lead.id || '-'}</td>
+                        <td style="font-weight: 500;">${lead.name || '-'}</td>
+                        <td>${lead.title || '-'}</td>
+                        <td>${lead.company || '-'}</td>
+                        <td>
+                            <div style="margin-bottom: 0.25rem; text-transform: capitalize;">${lead.platform || '-'}</div>
+                            <div style="font-size: 0.75rem;">${platformLink}</div>
+                        </td>
+                        <td><span class="badge ${stageBadgeClass}">${lead.stage || 'unknown'}</span></td>
+                        <td style="color: var(--text-secondary);">${lead.last_followup || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('table-body').innerHTML = html;
+
+            // Render Metrics
+            const totalLeads = data.length;
+            const metricsHtml = `
+                <div class="metric-card"><div class="metric-title">Total Leads</div><div class="metric-value">${totalLeads}</div></div>
+                <div class="metric-card"><div class="metric-title">Discovered</div><div class="metric-value">${stages.discovered}</div></div>
+                <div class="metric-card"><div class="metric-title">Contacted</div><div class="metric-value">${stages.contacted}</div></div>
+                <div class="metric-card"><div class="metric-title">Replied</div><div class="metric-value">${stages.replied}</div></div>
+            `;
+            document.getElementById('metrics-container').innerHTML = metricsHtml;
+        }
+
+        // Init
+        loadData();
+    </script>
+</body>
+</html>
