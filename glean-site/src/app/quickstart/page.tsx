@@ -32,7 +32,7 @@ export default function QuickstartPage() {
         <p className={styles.text}>Add the Glean skill pack to your AI agent with a single command:</p>
         <div className={styles.codeBlock}>
           <span className={styles.codeLabel}>Terminal</span>
-          <code>npx skills add pathanaawej0-dot/Glean</code>
+          <code>npx skills add Glean-ai/Glean</code>
         </div>
         <p className={styles.text}>Verify the installation by asking your agent to <strong>"list installed skills"</strong>. You should see <code>glean</code>, <code>linkedin-outreach</code>, and others.</p>
       </section>

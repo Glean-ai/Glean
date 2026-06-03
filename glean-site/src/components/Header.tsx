@@ -36,7 +36,7 @@ export default function Header() {
           ))}
           <div className={styles.mobileActions}>
             <a
-              href="https://github.com/pathanaawej0-dot/Glean"
+              href="https://github.com/Glean-ai/Glean"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.installButton}
@@ -48,7 +48,7 @@ export default function Header() {
 
         <div className={styles.actions}>
           <a
-            href="https://github.com/pathanaawej0-dot/Glean"
+            href="https://github.com/Glean-ai/Glean"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.iconLink}
@@ -58,7 +58,7 @@ export default function Header() {
             </svg>
           </a>
           <a
-            href="https://github.com/pathanaawej0-dot/Glean"
+            href="https://github.com/Glean-ai/Glean"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.desktopInstallButton}

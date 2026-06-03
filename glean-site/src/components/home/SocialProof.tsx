@@ -27,9 +27,9 @@ export default function SocialProof() {
         </div>
       </div>
       <div className={styles.shieldStrip}>
-        <img src="https://img.shields.io/github/stars/pathanaawej0-dot/Glean?style=flat&color=6B46C1" alt="GitHub stars" />
-        <img src="https://img.shields.io/github/license/pathanaawej0-dot/Glean?style=flat&color=6B46C1" alt="License" />
-        <img src="https://img.shields.io/github/last-commit/pathanaawej0-dot/Glean?style=flat&color=6B46C1" alt="Last commit" />
+        <img src="https://img.shields.io/github/stars/Glean-ai/Glean?style=flat&color=6B46C1" alt="GitHub stars" />
+        <img src="https://img.shields.io/github/license/Glean-ai/Glean?style=flat&color=6B46C1" alt="License" />
+        <img src="https://img.shields.io/github/last-commit/Glean-ai/Glean?style=flat&color=6B46C1" alt="Last commit" />
       </div>
     </section>
   );

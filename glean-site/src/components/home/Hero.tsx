@@ -5,7 +5,7 @@ import styles from "./home.module.css";
 
 export default function Hero() {
   const [copied, setCopied] = useState(false);
-  const command = "npx skills add pathanaawej0-dot/Glean";
+  const command = "npx skills add Glean-ai/Glean";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(command);

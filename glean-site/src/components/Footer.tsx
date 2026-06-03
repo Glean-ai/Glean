@@ -7,7 +7,7 @@ export default function Footer() {
       <div className={styles.container}>
         <div className={styles.links}>
           <a
-            href="https://github.com/pathanaawej0-dot/Glean"
+            href="https://github.com/Glean-ai/Glean"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.link}
@@ -15,7 +15,7 @@ export default function Footer() {
             GitHub
           </a>
           <a
-            href="https://github.com/pathanaawej0-dot/Glean/blob/main/LICENSE"
+            href="https://github.com/Glean-ai/Glean/blob/main/LICENSE"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.link}

@@ -68,7 +68,7 @@ export default function BlogPost() {
 
         <ol>
           <li>
-            <strong>Install:</strong> Run <code>npx skills add pathanaawej0-dot/Glean</code> in your terminal.
+            <strong>Install:</strong> Run <code>npx skills add Glean-ai/Glean</code> in your terminal.
           </li>
           <li>
             <strong>Setup:</strong> Type <code>"setup glean"</code> in your agent chat. This will configure BrowserAct and help you define your targeting criteria.
@@ -95,7 +95,7 @@ export default function BlogPost() {
         </p>
         
         <div className={styles.codeBlock}>
-          <code>npx skills add pathanaawej0-dot/Glean</code>
+          <code>npx skills add Glean-ai/Glean</code>
         </div>
       </div>
     </article>
