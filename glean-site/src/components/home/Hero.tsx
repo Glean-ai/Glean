@@ -15,13 +15,12 @@ export default function Hero() {
 
   return (
     <section className={styles.hero}>
-      <span className={styles.tagline}>The lead skill that actually finds people.</span>
+      <span className={styles.tagline}>Turn your AI agent into an undetectable lead generation machine.</span>
       <h1 className={styles.title}>Glean</h1>
       <p className={styles.subtitle}>
-        An AI agent skill pack that searches LinkedIn, X, Email, and Google Maps for your ideal prospects. 
-        Track everything in a local CSV and automate outreach from your terminal.
+        Glean uses BrowserAct to search LinkedIn, X, and Maps without triggering anti-bot systems. 
+        Build your pipeline locally and automate hyper-personalized outreach straight from your terminal.
       </p>
-      
       <div className={styles.heroAction}>
         <div className={styles.heroCodeBlock}>
           <code>{command}</code>
