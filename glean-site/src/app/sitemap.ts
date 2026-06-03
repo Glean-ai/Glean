@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://glean-outreach.vercel.app'
+  const baseUrl = 'https://glean.aawej.in'
   
   return [
     {

@@ -17,7 +17,7 @@ No SaaS. No third-party CRM. No API keys. Everything runs locally through the us
 ## Repository Structure
 
 ```
-pathanaawej0-dot/Glean/
+Glean-ai/Glean/
 ├── skills/
 │   ├── glean/                 ← Entry point: setup + pipeline + orchestration
 │   │   ├── SKILL.md           ← Skill instructions for the agent
@@ -70,7 +70,7 @@ The skills use a **hub-and-spoke** pattern:
 
 ### Skill Lifecycle
 
-1. **Install**: `npx skills add pathanaawej0-dot/Glean` copies all 6 skills to agent's skills directory (`.agents/skills/` or `~/.config/opencode/skills/`).
+1. **Install**: `npx skills add Glean-ai/Glean` copies all 6 skills to agent's skills directory (`.agents/skills/` or `~/.config/opencode/skills/`).
 2. **Setup**: User says `"setup glean"`. Agent reads glean skill, runs first-run wizard:
    - Checks/installs BrowserAct CLI
    - Creates chrome-direct browser `glean`

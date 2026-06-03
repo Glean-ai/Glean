@@ -24,7 +24,7 @@ Glean v1.0 complete. 6 skills written and published. README, LICENSE, ARCHITECTU
 - Created all 6 skills under `skills/`
 - Set up BrowserAct CLI, chrome-direct browser `github-chrome`
 - Wrote ICP template, CSV template
-- Published to GitHub `pathanaawej0-dot/Glean`
+- Published to GitHub `Glean-ai/Glean`
 - Setup: ICP questions, BrowserAct check, directory creation
 
 ### Session 2 — Cleanup & Polish
@@ -72,8 +72,8 @@ Glean v1.0 complete. 6 skills written and published. README, LICENSE, ARCHITECTU
 | Item | Value |
 |------|-------|
 | GitHub user | `pathanaawej0-dot` |
-| Repo | `pathanaawej0-dot/Glean` |
-| Install cmd | `npx skills add pathanaawej0-dot/Glean` |
+| Repo | `Glean-ai/Glean` |
+| Install cmd | `npx skills add Glean-ai/Glean` |
 | Logo file | `glean-logo.svg` |
 | Site dir | `glean-site/` |
 | Skill count | 6 (glean, linkedin-outreach, x-outreach, email-outreach, gmaps-outreach, browser-act) |
