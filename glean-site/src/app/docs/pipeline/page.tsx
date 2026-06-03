@@ -41,6 +41,19 @@ export default function PipelineDoc() {
       </section>
 
       <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Visual Dashboard</h2>
+        <p className={styles.text}>
+          Glean automatically scaffolds a rich HTML dashboard for your leads. To view it, open the following file in your browser:
+        </p>
+        <div className={styles.codeBlock}>
+          <code>./glean-data/pipeline.html</code>
+        </div>
+        <p className={styles.text}>
+          This dashboard provides a modern interface to view your metrics, filter leads, and visit social profiles with one click.
+        </p>
+      </section>
+
+      <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Pipeline Commands</h2>
         <div className={styles.codeBlock}>
           <code>"show my pipeline"</code> — Displays a summary of all leads.
