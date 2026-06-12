@@ -2,97 +2,136 @@
 
 ## Overview
 
-Glean is an AI agent skill pack for lead management. It finds prospects on LinkedIn, X/Twitter, Email, and Google Maps, tracks them in a local CSV, and handles outreach — all through natural conversation with an AI coding agent.
+Glean is an AI-powered CMO agent that builds marketing and sales skills for any AI coding agent. It understands your business, picks the right channels, generates custom outreach skills, and helps you execute campaigns — all stored locally.
 
 No SaaS. No third-party CRM. No API keys. Everything runs locally through the user's browser via BrowserAct.
 
 ## Philosophy
 
-- **Manual-first**: Every action is user-triggered. No automation, no cron, no scheduled tasks.
+- **CMO-first**: The agent acts as your Chief Marketing Officer — strategic, adaptive, results-driven.
 - **Local-first**: All data lives in `./glean-data/` relative to the user's project. No cloud sync.
 - **Browser-native**: Uses the user's existing Chrome session (chrome-direct) to interact with web platforms.
-- **Pipeline-over-tooling**: A simple CSV with stages replaces a CRM. Simplicity wins.
-- **Skill-ecosystem**: Distributed via `npx skills add` — works across 67+ AI coding agents.
+- **Skill-generation**: Instead of fixed workflows, Glean generates skills tailored to your business.
+- **Skill-ecosystem**: Generated skills follow the agentskills.io standard — works across 67+ AI coding agents.
+
+## How It Works
+
+```
+User installs Glean → CMO learns about business → CMO builds skills → User runs outreach
+```
+
+1. **Install**: `npx skills add Glean-ai/Glean` installs the CMO meta-skill
+2. **Setup**: User says "setup glean" → CMO scrapes website / reads code / asks questions → writes profile, audience, strategy
+3. **Generate**: CMO builds platform-specific skills based on strategy → installs to agent's skills directory
+4. **Execute**: User activates generated skill → runs outreach → results flow back to `./glean-data/`
+5. **Adjust**: CMO reviews results → suggests changes → regenerates skills as needed
 
 ## Repository Structure
 
 ```
 Glean-ai/Glean/
 ├── skills/
-│   ├── glean/                 ← Entry point: setup + pipeline + orchestration
-│   │   ├── SKILL.md           ← Skill instructions for the agent
-│   │   ├── leads.csv          ← CSV template (bundled, installed with skill)
-│   │   └── icp-template.md    ← ICP template (bundled, installed with skill)
-│   ├── linkedin-outreach/     ← LinkedIn: search, connect, message, follow-up
-│   │   └── SKILL.md
-│   ├── x-outreach/            ← X/Twitter: search profiles/posts, reply, DM
-│   │   └── SKILL.md
-│   ├── email-outreach/        ← Email: find, verify, send, track
-│   │   └── SKILL.md
-│   ├── gmaps-outreach/        ← Google Maps: business search, enrichment
-│   │   └── SKILL.md
-│   └── browser-act/           ← BrowserAct CLI reference (copied from agent skills)
+│   ├── glean/                     ← CMO meta-skill (the only skill that ships)
+│   │   ├── SKILL.md               ← CMO behavior and instructions
+│   │   ├── references/
+│   │   │   ├── marketing-playbooks.md  ← Strategy frameworks by stage
+│   │   │   ├── platform-guides.md      ← LinkedIn/X/Email/Maps workflows
+│   │   │   └── skills-format.md        ← agentskills.io standard reference
+│   │   └── assets/
+│   │       ├── profile-template.md     ← Template for user profile
+│   │       ├── audience-template.md    ← Template for target audience
+│   │       └── skill-template.md       ← Template for generated skills
+│   └── browser-act/               ← Browser automation (kept from v1)
 │       └── SKILL.md
-├── glean-site/                ← Next.js marketing + docs site (source)
-├── glean-logo.svg             ← Project logo (SVG)
-├── README.md                  ← Install guide, command reference, CSV schema
-├── ARCHITECTURE.md            ← This file
-├── AGENTS.md                  ← Agent session context
-├── LICENSE                    ← MIT
+├── CONTEXT.md                     ← Domain glossary
+├── ARCHITECTURE.md                ← This file
+├── AGENTS.md                      ← Agent session context
+├── README.md                      ← Install guide
+├── LICENSE                        ← MIT
 ├── .gitignore
-└── package.json               ← (future: site dependencies if needed)
+└── glean-site/                    ← Next.js marketing site
 ```
 
 ## Skill Architecture
 
-### How Skills Work Together
+### The CMO Meta-Skill
 
-The skills use a **hub-and-spoke** pattern:
+Glean ships with ONE skill: the CMO. It does not do outreach itself — it builds the skills that do.
 
 ```
-┌─────────────────────────────────┐
-│         glean (hub)             │
-│  Setup · Pipeline · Orchestrate │
-│  Bundles: leads.csv, icp.md     │
-└──────────┬──────────────────────┘
-           │ loads platform skill
+┌─────────────────────────────────────┐
+│          glean (CMO)                │
+│  Understands business               │
+│  Picks channels                     │
+│  Generates skills                   │
+│  Reviews results                    │
+│  Adjusts strategy                   │
+└──────────┬──────────────────────────┘
+           │ generates
      ┌─────┼─────┬──────┬──────┐
      ▼     ▼     ▼      ▼      ▼
- ┌──────┐ ┌──┐ ┌─────┐ ┌────┐ ┌──────────┐
- │Linked│ │ X│ │Email│ │Maps│ │BrowserAct│
- │ -in  │ │  │ │     │ │    │ │ (ref)    │
- └──────┘ └──┘ └─────┘ └────┘ └──────────┘
+ ┌──────┐ ┌──┐ ┌─────┐ ┌────┐ ┌──────┐
+ │Linked│ │ X│ │Email│ │Maps│ │ custom│
+ │ -in  │ │  │ │     │ │    │ │ ...   │
+ └──────┘ └──┘ └─────┘ └────┘ └──────┘
+           ↑
+     Generated skills — user can
+     edit, delete, or regenerate
 ```
 
-- **glean** is the hub. The user loads this first. It handles setup (ICP questions, directory creation, BrowserAct installation) and pipeline management (view CSV, update stages, send follow-ups across platforms).
-- **Platform skills** are loaded on demand. The user says "find leads on LinkedIn" → Glean loads `linkedin-outreach` skill. Each platform skill handles search, extraction, outreach, and platform-specific follow-up.
-- **browser-act** is a shared reference skill. It's loaded by any platform skill when BrowserAct CLI commands are needed. Never invoked directly.
+### How Skills Get Generated
 
-### Skill Lifecycle
+1. CMO reads `./glean-data/profile.md` (what you sell, who you target)
+2. CMO reads `./glean-data/target-audience.md` (refined ICP)
+3. CMO reads `./glean-data/strategy.md` (current plan)
+4. CMO researches the platform if needed (web search)
+5. CMO generates SKILL.md following agentskills.io format
+6. CMO installs to user's chosen skills directory (`.agents/skills/` or agent-specific)
+7. If agent supports commands, CMO can create commands for frequently-used workflows
 
-1. **Install**: `npx skills add Glean-ai/Glean` copies all 6 skills to agent's skills directory (`.agents/skills/` or `~/.config/opencode/skills/`).
-2. **Setup**: User says `"setup glean"`. Agent reads glean skill, runs first-run wizard:
-   - Checks/installs BrowserAct CLI
-   - Creates chrome-direct browser `glean`
-   - Asks 9 ICP questions
-   - Writes `./glean-data/icp/ideal-customer-profile.md`
-   - Writes `./glean-data/data/leads.csv`
-3. **Use**: User triggers any workflow. Agent loads relevant platform skill.
-4. **Pipeline**: Agent reads/writes CSV directly. All state is in the file.
+### Generated Skill Structure
 
-### Skill Loading Convention
+Every generated skill follows this pattern:
 
-Each SKILL.md has:
-- `---` frontmatter with name and trigger description
-- Agent reads the frontmatter `description` to decide when to load
-- Platform skills start by saying "Load the `browser-act` skill for all CLI commands"
-- All paths use `./glean-data/` (relative to cwd)
+```
+glean-<platform>-<purpose>/
+├── SKILL.md              ← Main instructions
+├── references/           ← Optional: detailed guides
+├── scripts/              ← Optional: helper scripts
+└── assets/               ← Optional: templates
+```
+
+### Skill Chaining
+
+Generated skills can reference other skills. For complex workflows, the CMO creates an orchestrator skill that chains multiple platform skills together. Example: "Find leads on LinkedIn → verify emails → send outreach."
 
 ## Data Model
 
-### CSV Schema
+### Data Directory
 
-File: `./glean-data/data/leads.csv`
+```
+./glean-data/
+├── profile.md              ← User's business identity
+├── target-audience.md      ← ICP, evolves over time
+├── strategy.md             ← Current marketing strategy
+├── campaigns/
+│   └── <platform>/
+│       └── leads.csv       ← Per-platform lead data
+```
+
+### Profile
+
+Contains: what you sell, who you sell to, your voice, your tools, your stage.
+
+### Target Audience
+
+Contains: roles, industries, company sizes, where to find them, what they care about, outreach approach.
+
+### Strategy
+
+Contains: active channels, current focus, what's working, what's not, next actions.
+
+### CSV Schema
 
 ```
 id,name,title,company,industry,linkedin_url,x_handle,email,stage,score,source,platform,tags,notes,first_contact,last_followup,next_followup
@@ -101,108 +140,22 @@ id,name,title,company,industry,linkedin_url,x_handle,email,stage,score,source,pl
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | int | Auto-incrementing ID |
-| `name` | string | Lead name (person or business name) |
-| `title` | string | Job title (LinkedIn/X) or business category (Maps) |
+| `name` | string | Lead name |
+| `title` | string | Job title or business category |
 | `company` | string | Company name |
-| `industry` | string | Industry classification |
+| `industry` | string | Industry |
 | `linkedin_url` | string | LinkedIn profile URL |
 | `x_handle` | string | X/Twitter handle |
 | `email` | string | Email address |
 | `stage` | enum | `discovered` → `contacted` → `replied` → `meeting_booked` → `converted` → `dead` |
-| `score` | int | Lead score (0-100). For Maps: star rating * 20 |
-| `source` | string | How the lead was found (e.g., "linkedin search: CTO SaaS", "maps: plumber Austin") |
-| `platform` | enum | `linkedin`, `x`, `email`, `gmaps` — which platform sourced this lead |
-| `tags` | string | Comma-separated tags for filtering |
-| `notes` | string | Outreach notes, phone number, website URL |
+| `score` | int | Lead score (0-100) |
+| `source` | string | How the lead was found |
+| `platform` | enum | `linkedin`, `x`, `email`, `gmaps` |
+| `tags` | string | Comma-separated tags |
+| `notes` | string | Outreach notes |
 | `first_contact` | date | Date of first outreach |
 | `last_followup` | date | Date of most recent follow-up |
 | `next_followup` | date | Scheduled next follow-up date |
-
-### ICP Structure
-
-File: `./glean-data/icp/ideal-customer-profile.md`
-
-```markdown
-# Ideal Customer Profile
-
-## Target Role
-- Title(s): <answer>
-- Seniority: <answer>
-
-## Industry
-- <answer>
-
-## Company
-- Size: <answer>
-- Stage: <answer>
-- Location: <answer>
-
-## Keywords for Search
-- <answer>
-
-## Outreach Angle
-- <answer>
-
-## Exclusions
-- <answer>
-
-## Custom Instructions for Agent
-These rules override everything else. The agent MUST follow them strictly.
-- Outreach tone:
-- Connection note style:
-- Follow-up cadence:
-- Do NOT:
-- Always:
-- Lead qualification:
-```
-
-The agent reads this file before every outreach session. Exclusions are enforced strictly — the agent skips any lead matching exclusion criteria.
-
-### Runtime Directory Structure
-
-After setup, the user's project has:
-
-```
-./glean-data/
-├── data/
-│   └── leads.csv
-└── icp/
-    └── ideal-customer-profile.md
-```
-
-## Pipeline Flow
-
-```
-                    ┌─────────────┐
-                    │  User says  │
-                    │ "find leads"│
-                    └──────┬──────┘
-                           ▼
-                    ┌─────────────┐
-                    │  Load glean │
-                    │   skill     │
-                    └──────┬──────┘
-                           ▼
-              ┌──────────────────────┐
-              │  Ask: which platform? │
-              └──┬───┬───┬────┬──────┘
-                 ▼   ▼   ▼    ▼
-           ┌──────┐ ┌─┐ ┌──┐ ┌────┐
-           │Linked │ │X│ │Mail│ │Maps│
-           │ -in   │ │ │ │   │ │    │
-           └───┬───┘ └┬┘ └┬──┘ └┬───┘
-               │      │    │     │
-               ▼      ▼    ▼     ▼
-         ┌─────────────────────────┐
-         │  Search, extract, save  │
-         │  leads to CSV           │
-         └────────────┬────────────┘
-                      ▼
-         ┌─────────────────────────┐
-         │  Pipeline management:   │
-         │  show, update, follow-up│
-         └─────────────────────────┘
-```
 
 ### Stages
 
@@ -210,173 +163,63 @@ After setup, the user's project has:
 |-------|---------|-------------|
 | `discovered` | Found but not contacted | Send first outreach |
 | `contacted` | First outreach sent | Wait for reply or follow-up |
-| `replied` | Lead responded | Engage further, try to book meeting |
+| `replied` | Lead responded | Engage further, book meeting |
 | `meeting_booked` | Meeting scheduled | Prepare for call |
-| `converted` | Deal won / qualified | Move to active customer track |
+| `converted` | Deal won | Move to customer track |
 | `dead` | No longer pursuing | No further action |
 
-## Platform Workflows
+## Platform Detection
 
-### LinkedIn
+The CMO detects the agent platform by asking the agent. Every agent knows what it is from its system prompt. The CMO then:
 
-1. Navigate to LinkedIn search with ICP keywords
-2. Scroll and extract profile URLs from search results
-3. Visit each profile, extract: name, title, company, location, about
-4. Save to CSV with `platform=linkedin`
-5. On user command: navigate to profile, send connect request with personalized note from ICP angle
-6. Follow-up: check CSV for `stage=contacted` where `last_followup` > 3 days, send InMail/message
+1. Determines where to install generated skills (`.agents/skills/` universal or agent-specific directory)
+2. Checks if the agent supports commands (if yes, creates them for frequently-used workflows)
+3. Adapts generated skill instructions to the agent's capabilities
 
-### X/Twitter
-
-1. Search X for profiles matching ICP keywords (`?f=user`)
-2. Search X for posts with pain-point keywords (`?f=live`)
-3. Extract: name, bio, location, website, recent posts
-4. Save to CSV with `platform=x`
-5. On user command: reply to posts with value-add comments, or send DMs
-6. Follow-up: same cadence as LinkedIn
-
-### Email
-
-1. Cross-reference LinkedIn/X profiles with email finder tools (via BrowserAct)
-2. Verify email deliverability
-3. Save to CSV with `platform=email`
-4. On user command: compose and send personalized email via Gmail/Outlook
-5. Track replies, update stage
-
-### Google Maps
-
-1. Agent asks 8 customization questions before searching
-2. Search Maps for `<keyword> in <location>`
-3. Extract from result cards + detail panels: name, category, address, phone, website, rating
-4. Optionally visit each business website to find emails
-5. Save to CSV with `platform=gmaps`
-6. Outreach uses email (if found) or cross-reference to other platforms
-
-## Glean-Site Architecture
-
-### Purpose
-
-Multi-page marketing website and documentation for Glean. Hosted on Vercel. Built with Next.js + Tailwind CSS.
-
-### Design System
-
-Mirrors [openclaw.ai](https://openclaw.ai) — minimalist, monochrome dark theme.
-
-| Token | Value |
-|-------|-------|
-| Background | `#050810` |
-| Text | `#f0f4ff` |
-| Accent | TBD (purple? orange?) |
-| Font | Satoshi / system-ui sans-serif |
-| H1 | 72px bold, -2.16px letter-spacing |
-| H2 | 22.4px semibold, `⟩` prefix |
-| Body | 16px |
-| Nav | 14.4px semibold |
-
-### Page Structure
+## CMO Lifecycle
 
 ```
-/
-├── (Home)           → Hero, platform cards, GitHub stats, Install CTA
-├── platforms/       → 4 sections: LinkedIn, X, Email, Google Maps
-├── quickstart/      → Install guide, first-run setup, pipeline walkthrough
-├── docs/            → Documentation index (sidebar nav)
-│   ├── linkedin     → LinkedIn skill reference
-│   ├── x            → X skill reference
-│   ├── email        → Email skill reference
-│   ├── gmaps        → Google Maps skill reference
-│   └── pipeline     → Pipeline management, CSV schema, stages
-├── faq/             → Frequently asked questions
-└── showcase/        → (future) Community usage examples
+┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
+│  Setup   │────▶│ Generate │────▶│ Execute  │────▶│ Adjust   │
+│          │     │          │     │          │     │          │
+│ Learn    │     │ Build    │     │ Run      │     │ Review   │
+│ business │     │ skills   │     │ outreach │     │ results  │
+│ strategy │     │ install  │     │ track    │     │ iterate  │
+└──────────┘     └──────────┘     └──────────┘     └──────────┘
+     ▲                                                     │
+     └─────────────────────────────────────────────────────┘
+                        Re-run setup anytime
 ```
 
-#### Navigation
-
-```
-Glean | Platforms | Quickstart | Docs | GitHub | Install
-```
-
-- "Glean" = logo + home link
-- "Install" = prominent CTA button (different visual weight)
-
-### Social Proof Strategy
-
-Since Glean has no real users yet:
-
-1. **"Works With" brand strip** — LinkedIn, X/Twitter, Gmail, Google Maps logos. Borrows credibility from established platforms.
-2. **Sample CSV output** — A rendered table showing mock leads (name, title, company, platform, stage). Proves the tool produces real output.
-3. **GitHub badges** — Star count, last commit, license. Shows activity and credibility.
-4. **Agent compatibility badges** — "Works with Claude Code, Codex, Cursor, opencode, Windsurf, and 67+ others"
-5. **Use case scenarios** — Mini-cards like "Find 50 YC founders in SF on LinkedIn in 10 min" — aspirational proof
-6. **Comparison section** — "Before: 4 browser tabs, manual spreadsheet, no follow-up tracking. After: one command, unified CSV, automated pipeline"
-7. **ICP template preview** — Shows the structured approach, proves it's a real methodology
-
-### Route Design
-
-| Route | File | Content |
-|-------|------|---------|
-| `/` | `app/page.tsx` | Hero, platform summary, GitHub stats, install CTA, badges, social proof strip |
-| `/platforms` | `app/platforms/page.tsx` | 4 platform sections with workflow + sample output |
-| `/quickstart` | `app/quickstart/page.tsx` | Install, setup walkthrough, first pipeline |
-| `/docs` | `app/docs/page.tsx` | Documentation sidebar + content area |
-| `/docs/linkedin` | `app/docs/linkedin/page.tsx` | LinkedIn skill docs |
-| `/docs/x` | `app/docs/x/page.tsx` | X skill docs |
-| `/docs/email` | `app/docs/email/page.tsx` | Email skill docs |
-| `/docs/gmaps` | `app/docs/gmaps/page.tsx` | Google Maps skill docs |
-| `/docs/pipeline` | `app/docs/pipeline/page.tsx` | Pipeline, CSV schema, stages |
-| `/docs/icp` | `app/docs/icp/page.tsx` | ICP setup and customization |
-| `/faq` | `app/faq/page.tsx` | FAQ |
-| `/showcase` | `app/showcase/page.tsx` | (Future) Community examples |
-
-### Tech Stack
-
-| Layer | Choice | Rationale |
-|-------|--------|-----------|
-| Framework | Next.js 15 (App Router) | SSG-friendly, Vercel-native, file-based routing |
-| Styling | Tailwind CSS v4 | Matches openclaw's utility-first approach |
-| Font | Satoshi (via next/font) | Same as openclaw |
-| Deployment | Vercel | Zero-config, free tier, auto-deploy from GitHub |
-| Domain | glean.sh (or glean-leads.com) | Short, memorable (TBD) |
-
-### Dev Setup
-
-```bash
-cd glean-site
-npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir
-npm install @fontsource/satoshi
-npm run dev
-```
-
-## Tech Choices & Rationale
+## Tech Choices
 
 | Decision | Choice | Why |
 |----------|--------|-----|
-| Distribution | `npx skills add` | Works across 67+ agents, no npm packaging needed |
-| Browser automation | BrowserAct (chrome-direct) | Uses user's existing Chrome session, no separate browser |
-| Data storage | Local CSV | Simplest possible, zero infra, git-trackable |
-| Project scope | `./glean-data/` | Relative to project, not home dir — works in any workspace |
-| No automation | Manual only | User wants full control, no cron, no scheduled tasks |
-| Website framework | Next.js + Tailwind | Same ecosystem as openclaw, easy Vercel deploy |
-| Website theme | Dark minimal | Matches openclaw aesthetic, dev audience expectation |
-| Outreach platforms | LinkedIn, X, Email, Maps | Covers professional social, social media, direct email, local business |
+| Architecture | Single CMO meta-skill | Fixed skills break for different businesses |
+| Skill generation | Runtime, per-user | Each user gets tailored skills |
+| Distribution | `npx skills add` | Works across 67+ agents |
+| Skills format | agentskills.io standard | Universal, portable |
+| Browser | BrowserAct (chrome-direct) | Uses user's Chrome, no extra setup |
+| Data storage | Local CSV + markdown | Simple, zero infra, git-trackable |
+| Agent detection | Ask the agent | Agent knows what it is |
+| Commands | Optional, agent-dependent | Only if agent supports them |
 
 ## Roadmap
 
-### Phase 1 — Current (v1.0)
-- 4 platform skills working
-- ICP setup with 9 questions
-- CSV pipeline management
-- Basic outreach (connect, DM, email, follow-up)
-- README + install guide
+### Phase 1 — Current (v2.0)
+- CMO meta-skill with full setup flow
+- Generated skills for LinkedIn, X, Email, Google Maps
+- Marketing playbooks by business stage
+- Platform detection and skill installation
 
-### Phase 2 — Website (v1.1)
-- glean-site built and deployed
-- Social proof sections live
-- Full documentation pages
+### Phase 2 — Enhancement (v2.1)
+- Multi-skill orchestrator workflows
+- Command generation for supported agents
+- Campaign analytics and reporting
+- Strategy adjustment recommendations
 
-### Phase 3 — Community (v1.2+)
-- Reddit outreach skill
-- Better email finder workflows
-- Lead scoring improvements
-- Additional platform support (GitHub, Discord, Slack)
-- Showcase page with community examples
+### Phase 3 — Scale (v3.0)
+- Plugin generation for agents that support it
+- MCP integrations (HubSpot, etc.)
+- Automated campaign execution
+- Community-generated skill templates

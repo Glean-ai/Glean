@@ -16,39 +16,46 @@ Single-context — one CONTEXT.md + docs/adr/ at the repo root. See `docs/agents
 
 ## Current State
 
-Glean v1.0 complete. 6 skills written and published. README, LICENSE, ARCHITECTURE.md present. glean-site directory exists but not yet built.
+Glean v2.0 — CMO meta-skill architecture. Single skill that generates other skills. No fixed platform skills.
 
 ## Session History
 
-### Session 1 — Initial Build
-- Created all 6 skills under `skills/`
-- Set up BrowserAct CLI, chrome-direct browser `github-chrome`
+### Session 1 — Initial Build (v1.0)
+- Created 6 skills: glean, linkedin-outreach, x-outreach, email-outreach, gmaps-outreach, browser-act
+- Set up BrowserAct CLI, chrome-direct browser
 - Wrote ICP template, CSV template
-- Published to GitHub `Glean-ai/Glean`
-- Setup: ICP questions, BrowserAct check, directory creation
+- Published to GitHub
 
 ### Session 2 — Cleanup & Polish
-- Switched all paths from `~/glean/` to `./glean-data/` (relative, project-scoped)
-- Deleted `.opencode/`, `.opencode-plugin/`, `scripts/`, old data dirs
-- Rewrote README with comprehensive install guide + CSV schema
-- Created glean-site directory, generated logo
-- Committed and pushed (8 commits total)
+- Switched paths from `~/glean/` to `./glean-data/`
+- Rewrote README, created glean-site directory
+- Committed and pushed
 
 ### Session 3 — Website Planning
-- Inspected openclaw.ai design (CDP, not BrowserAct)
-- Decided: multi-page site, minimalist dark theme, mirror openclaw style
-- Created `ARCHITECTURE.md` (site + project architecture)
-- Created `AGENTS.md` (this file)
+- Created ARCHITECTURE.md, AGENTS.md
+- Designed multi-page Next.js site
+
+### Session 4 — CMO Refactor (v2.0)
+- Killed all fixed platform skills
+- Redesigned as single CMO meta-skill
+- Agent generates skills at runtime based on user's business
+- Skills follow agentskills.io standard
+- Created: references (marketing-playbooks, platform-guides, skills-format)
+- Created: assets (profile-template, audience-template, skill-template)
+- Updated CONTEXT.md with domain glossary
 
 ## Key Decisions
 
 | Decision | Choice | Reason |
 |----------|--------|--------|
+| Architecture | Single CMO meta-skill | Fixed skills break for different businesses. CMO adapts. |
+| Skill generation | Runtime, per-user | Each user gets skills tailored to their product and audience |
 | Data path | `./glean-data/` | Relative, project-scoped, works across agents |
 | Browser | chrome-direct (BrowserAct) | Uses user's running Chrome, no extra setup |
 | Distribution | `npx skills add` | Pure skills, no npm plugin, 67+ agent compatible |
-| Styling | Dark minimal, openclaw-like | Dev audience, proven aesthetic |
-| Website | Multi-page Next.js | Not single-scroll, real site architecture |
+| Skills format | agentskills.io standard | Universal, works across all agents |
+| Agent detection | Ask the agent | Agent knows what it is from system prompt |
+| Plugins/MCP | Out of scope (v2) | Focus on skills first. Plugins later. |
 
 ## Conventions
 
@@ -58,6 +65,36 @@ Glean v1.0 complete. 6 skills written and published. README, LICENSE, ARCHITECTU
 - Git commits: concise, no emoji, describe what changed
 - No comments in code files unless essential
 - No automation/cron — manual trigger only
+
+## Data Structure
+
+```
+./glean-data/
+├── profile.md              # User's business identity
+├── target-audience.md      # ICP, evolves over time
+├── strategy.md             # Current marketing strategy
+├── campaigns/
+│   └── <platform>/
+│       └── leads.csv       # Per-platform lead data
+```
+
+## Skill Structure
+
+```
+skills/
+├── glean/                  # CMO meta-skill
+│   ├── SKILL.md            # CMO behavior
+│   ├── references/
+│   │   ├── marketing-playbooks.md
+│   │   ├── platform-guides.md
+│   │   └── skills-format.md
+│   └── assets/
+│       ├── profile-template.md
+│       ├── audience-template.md
+│       └── skill-template.md
+└── browser-act/            # Browser automation (kept from v1)
+    └── SKILL.md
+```
 
 ## Voice & Tone (for glean-site)
 
@@ -74,19 +111,9 @@ Glean v1.0 complete. 6 skills written and published. README, LICENSE, ARCHITECTU
 | GitHub user | `pathanaawej0-dot` |
 | Repo | `Glean-ai/Glean` |
 | Install cmd | `npx skills add Glean-ai/Glean` |
-| Logo file | `glean-logo.svg` |
 | Site dir | `glean-site/` |
-| Skill count | 6 (glean, linkedin-outreach, x-outreach, email-outreach, gmaps-outreach, browser-act) |
-| Platforms | linkedin, x, email, gmaps |
-| CSV stages | discovered → contacted → replied → meeting_booked → converted → dead |
+| Skill count | 2 (glean, browser-act) |
 | Site framework | Next.js 15 + Tailwind CSS v4 |
-
-## References
-
-- openclaw.ai design: BG `#050810`, text `#f0f4ff`, font Satoshi, H1 72px bold, H2 22.4px with `⟩` prefix
-- openclaw margin/padding: main section padding `60px 24px 40px`
-- openclaw nav: 14.4px semibold
-- ARCHITECTURE.md: full project and site architecture reference
 
 ## Deployment
 
@@ -94,16 +121,7 @@ Glean v1.0 complete. 6 skills written and published. README, LICENSE, ARCHITECTU
 
 ## Next Tasks (Priority Order)
 
-1. ~~Build glean-site (Next.js multi-page site)~~
-2. ~~Deploy to Vercel~~ (live at glean.aawej.in)
-3. Add showcase page (once community usage exists)
-
-## Social Proof Plan (no real users yet)
-
-- "Works With" platform brand strip (LinkedIn, X, Gmail, Google Maps)
-- Sample CSV table with mock leads
-- GitHub badges (stars, license, last commit)
-- Agent compatibility badges (Claude Code, Codex, Cursor, opencode, Windsurf)
-- Use case scenario mini-cards
-- "Before vs After" comparison
-- ICP template preview
+1. Update README for v2 architecture
+2. Update ARCHITECTURE.md for v2
+3. Test the CMO skill with a real agent
+4. Update glean-site docs for v2
