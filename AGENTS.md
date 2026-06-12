@@ -88,10 +88,14 @@ Glean v1.0 complete. 6 skills written and published. README, LICENSE, ARCHITECTU
 - openclaw nav: 14.4px semibold
 - ARCHITECTURE.md: full project and site architecture reference
 
+## Deployment
+
+- Live at: https://glean.aawej.in
+
 ## Next Tasks (Priority Order)
 
-1. Build glean-site (Next.js multi-page site)
-2. Deploy to Vercel
+1. ~~Build glean-site (Next.js multi-page site)~~
+2. ~~Deploy to Vercel~~ (live at glean.aawej.in)
 3. Add showcase page (once community usage exists)
 
 ## Social Proof Plan (no real users yet)

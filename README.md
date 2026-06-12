@@ -7,7 +7,7 @@
 
 Glean is an open-source AI agent skill pack that turns your local coding agent into a high-performance lead generation engine. It finds prospects on **LinkedIn**, **X (Twitter)**, and **Google Maps**, tracks them in a local CSV, and handles personalized outreach—all through natural terminal conversation.
 
-**[View Documentation & Blog →](https://glean-outreach.vercel.app)**
+**[View Documentation & Blog →](https://glean.aawej.in)**
 
 ---
 
@@ -63,7 +63,7 @@ No third-party CRM or SaaS fees. Everything is stored in a `leads.csv` in your p
 
 ## 📖 Documentation
 
-For detailed guides on each platform, pipeline management, and ICP optimization, visit our [official documentation](https://glean-outreach.vercel.app/docs).
+For detailed guides on each platform, pipeline management, and ICP optimization, visit our [official documentation](https://glean.aawej.in/docs).
 
 ## 🤝 Contributing
 
