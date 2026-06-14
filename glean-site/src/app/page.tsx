@@ -1,23 +1,15 @@
-import Hero from "@/components/home/Hero";
-import PlatformCards from "@/components/home/PlatformCards";
-import InstallSection from "@/components/home/InstallSection";
-import SocialProof from "@/components/home/SocialProof";
-import UseCaseCards from "@/components/home/UseCaseCards";
-import ComparisonSection from "@/components/home/ComparisonSection";
-import LeadTable from "@/components/home/LeadTable";
-import ICPPreview from "@/components/home/ICPPreview";
+import Hero from "@/components/hero";
+import Skills from "@/components/skills";
+import HowItWorks from "@/components/how-it-works";
+import InstallSection from "@/components/install-section";
 
 export default function Home() {
   return (
-    <div className="home-container">
+    <div className="mx-auto max-w-6xl px-4">
       <Hero />
-      <SocialProof />
-      <PlatformCards />
+      <Skills />
+      <HowItWorks />
       <InstallSection />
-      <UseCaseCards />
-      <ComparisonSection />
-      <LeadTable />
-      <ICPPreview />
     </div>
   );
 }
