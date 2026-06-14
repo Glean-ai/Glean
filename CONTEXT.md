@@ -1,57 +1,62 @@
 # Glean
 
-AI-powered CMO agent that builds marketing and sales skills for any AI coding agent.
+AI-powered RevOps skills framework for technical founders with zero customers.
 
 ## Language
 
-**CMO**:
-The meta-skill's role. Acts as a Chief Marketing Officer — evaluates your business, picks channels, builds workflows, executes campaigns, and adjusts strategy based on results.
-_Avoid_: Mentor, assistant, bot, helper
+**RevOps**:
+Revenue operations — the full front-side of a business: finding customers, reaching out, creating content, engaging communities, tracking pipeline, and adjusting strategy. Not just marketing, not just sales. Everything that brings paying users.
+_Avoid_: Marketing automation, sales tool, CRM
 
-**Meta-skill**:
-The single Glean skill that generates other skills. It is not used for outreach itself — it only builds the skills that do.
-_Avoid_: Master skill, core skill, main skill
+**Founder**:
+The user. A technical person who built a product but doesn't know how to get customers. Glean handles the front-side so they can focus on the product.
+_AAvoid_: User, customer, operator
 
-**Generated skill**:
-A real, standard-format skill (agentskills.io) created by the CMO for a specific platform and workflow. Installed into the agent's skills directory and loadable like any other skill.
-_Avoid_: Output, artifact, template
+**Lead**:
+A specific person who matches the founder's ideal customer profile. Has a name, company, contact info, and a pipeline stage.
+_Avoid_: Prospect, contact, target
 
-**Orchestrator skill**:
-A generated skill that runs a full workflow end-to-end — from search to outreach to reporting. One skill, one activation, complete execution.
-_Avoid_: Workflow skill, automation skill
-
-**Command**:
-An optional shortcut the CMO can create if the agent supports commands. A command is a named trigger (e.g., `/find-leads`, `/run-outreach`) that activates a skill or workflow. Only created when the agent confirms it supports commands.
-_Avoid_: Alias, shortcut, macro
-
-**Profile**:
-User's business identity stored in `./glean-data/profile.md`. Contains what they sell, who they target, their voice, and their tools. Created during setup, re-runnable.
-_Avoid_: Config, settings, preferences
-
-**Target audience**:
-Refined ICP stored in `./glean-data/target-audience.md`. Evolves over time as the CMO learns from campaign results.
-_Avoid_: ICP, ideal customer, persona
-
-**Campaign**:
-A specific outreach effort on a specific platform. Data lives in `./glean-data/campaigns/<platform>/leads.csv`.
-_Avoid_: Run, batch, push
-
-**Strategy**:
-The current marketing plan stored in `./glean-data/strategy.md`. Tracks active channels, target focus, outreach tone, and what's working. Created by the CMO during setup, updated as campaigns run.
-_Avoid_: Plan, approach, roadmap
+**Pipeline**:
+The stages a lead moves through: discovered → contacted → replied → meeting_booked → converted → dead. Tracked in leads.csv.
+_Avoid_: Funnel, workflow, process
 
 **Stage**:
 Where a lead is in the pipeline: discovered → contacted → replied → meeting_booked → converted → dead.
 _Avoid_: Status, phase, step
 
-**Agent Platform**:
-The AI coding agent the user is running (Claude Code, OpenCode, Cursor, Windsurf, etc.). The agent already knows what it is from its system prompt. Determines where skills are installed. If the agent supports commands, the CMO can create them.
-_Avoid_: Client, runtime, host
+**Channel**:
+A platform used for outreach or content: LinkedIn, X/Twitter, email, Reddit, HN. Strategy defines which channels to use.
+_Avoid_: Platform, medium, route
 
-**Skills format**:
-The agentskills.io standard for creating skills. SKILL.md with YAML frontmatter (name, description) + markdown body. Optional directories: scripts/, references/, assets/. The universal format the CMO uses to generate all skills.
-_Avoid_: Skill spec, skill standard
+**Confirmation gate**:
+Every browser action requires founder approval before execution. Agent previews what it's about to do, founder approves or modifies.
+_AAvoid_: Safety check, approval flow, gate
 
-**Progressive disclosure**:
-How skills load: metadata (~100 tokens) at startup, full instructions when activated, resources on demand. Keeps context footprint small.
-_Avoid_: Lazy loading, on-demand loading
+**Stateful skill**:
+A skill that reads and writes data files. Previous runs inform current runs. The system gets smarter over time.
+_AAvoid_: Persistent, memory-enabled
+
+**Content draft**:
+A piece of content (post, thread, article, email) written by the agent and saved as a file. Founder edits and publishes manually. Agent never publishes.
+_Avoid_: Post, output, artifact
+
+**Community engagement**:
+Participating in Reddit, HN, Discord discussions. Agent finds relevant threads, suggests helpful responses. Founder posts manually.
+_Avoid_: Social selling, community outreach
+
+## Relationships
+
+- A **founder** has a **product** and needs **leads**
+- A **lead** moves through **pipeline stages**
+- A **strategy** defines which **channels** to use
+- Each **channel** has specific outreach and content patterns
+- Every browser action goes through a **confirmation gate**
+- All data lives in `./glean-data/` and persists between sessions
+
+## Core Principles
+
+1. **Founder is always in control.** Agent proposes, founder approves.
+2. **Skills are small and composable.** Each does ONE thing.
+3. **Stateful through files.** Data persists between sessions.
+4. **Progressive disclosure.** Load what's needed when needed.
+5. **Human-readable data.** Markdown and CSV.

@@ -2,108 +2,157 @@
 
 ## Overview
 
-Glean is an AI-powered CMO agent that builds marketing and sales skills for any AI coding agent. It understands your business, picks the right channels, generates custom outreach skills, and helps you execute campaigns — all stored locally.
+Glean is a 7-skill RevOps framework for technical founders with zero customers. It handles all front-side revenue operations: finding customers, reaching out, creating content, engaging communities, tracking pipeline, and adjusting strategy.
 
-No SaaS. No third-party CRM. No API keys. Everything runs locally through the user's browser via BrowserAct.
+No SaaS. No third-party CRM. No API keys. Everything runs locally through the founder's browser via BrowserAct.
 
 ## Philosophy
 
-- **CMO-first**: The agent acts as your Chief Marketing Officer — strategic, adaptive, results-driven.
-- **Local-first**: All data lives in `./glean-data/` relative to the user's project. No cloud sync.
-- **Browser-native**: Uses the user's existing Chrome session (chrome-direct) to interact with web platforms.
-- **Skill-generation**: Instead of fixed workflows, Glean generates skills tailored to your business.
-- **Skill-ecosystem**: Generated skills follow the agentskills.io standard — works across 67+ AI coding agents.
+- **Founder-first**: The founder is always in control. Agent proposes, founder approves.
+- **Local-first**: All data lives in `./glean-data/` relative to the founder's project. No cloud sync.
+- **Browser-native**: Uses the founder's existing Chrome session (chrome-direct) to interact with web platforms.
+- **Composable skills**: Each skill does ONE thing. Skills chain naturally.
+- **Stateful**: Skills read and write data files. Previous runs inform current runs.
 
 ## How It Works
 
 ```
-User installs Glean → CMO learns about business → CMO builds skills → User runs outreach
+Founder installs Glean → Setup → Find leads → Reach out → Track → Review → Repeat
 ```
 
-1. **Install**: `npx skills add Glean-ai/Glean` installs the CMO meta-skill
-2. **Setup**: User says "setup glean" → CMO scrapes website / reads code / asks questions → writes profile, audience, strategy
-3. **Generate**: CMO builds platform-specific skills based on strategy → installs to agent's skills directory
-4. **Execute**: User activates generated skill → runs outreach → results flow back to `./glean-data/`
-5. **Adjust**: CMO reviews results → suggests changes → regenerates skills as needed
+1. **Install**: `npx skills add Glean-ai/Glean` installs all 7 skills
+2. **Setup**: Founder says "setup glean" → agent learns about business → writes profile, audience, strategy
+3. **Find**: Founder says "find leads" → agent searches LinkedIn, X, email → writes to CSV
+4. **Reach**: Founder says "send outreach" → agent composes messages → founder approves → sends
+5. **Track**: Founder says "pipeline" → agent shows status, follow-ups, conversion rates
+6. **Review**: Founder says "review results" → agent analyzes what works → suggests changes
+7. **Repeat**: Cycle continues, system gets smarter over time
 
 ## Repository Structure
 
 ```
 Glean-ai/Glean/
 ├── skills/
-│   ├── glean/                     ← CMO meta-skill (the only skill that ships)
-│   │   ├── SKILL.md               ← CMO behavior and instructions
+│   ├── glean-setup/                ← Business discovery
+│   │   ├── SKILL.md
 │   │   ├── references/
-│   │   │   ├── marketing-playbooks.md  ← Strategy frameworks by stage
-│   │   │   ├── platform-guides.md      ← LinkedIn/X/Email/Maps workflows
-│   │   │   └── skills-format.md        ← agentskills.io standard reference
+│   │   │   ├── discovery-prompts.md
+│   │   │   └── channel-selection.md
 │   │   └── assets/
-│   │       ├── profile-template.md     ← Template for user profile
-│   │       ├── audience-template.md    ← Template for target audience
-│   │       └── skill-template.md       ← Template for generated skills
-│   └── browser-act/               ← Browser automation (kept from v1)
-│       └── SKILL.md
-├── CONTEXT.md                     ← Domain glossary
-├── ARCHITECTURE.md                ← This file
-├── AGENTS.md                      ← Agent session context
-├── README.md                      ← Install guide
-├── LICENSE                        ← MIT
+│   │       ├── profile-template.md
+│   │       ├── audience-template.md
+│   │       ├── strategy-template.md
+│   │       └── leads-template.csv
+│   ├── glean-find/                 ← Lead discovery
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── linkedin-search.md
+│   │       ├── x-search.md
+│   │       ├── email-finder.md
+│   │       └── community-search.md
+│   ├── glean-reach/                ← Send outreach
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── linkedin-messaging.md
+│   │       ├── email-composition.md
+│   │       ├── x-dm.md
+│   │       └── follow-up-sequences.md
+│   ├── glean-content/              ← Write content
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── content-formats.md
+│   │       └── writing-tone.md
+│   ├── glean-community/            ← Engage communities
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── reddit-workflow.md
+│   │       ├── hn-workflow.md
+│   │       └── community-rules.md
+│   ├── glean-track/                ← Pipeline status
+│   │   └── SKILL.md
+│   └── glean-review/               ← Analyze results
+│       ├── SKILL.md
+│       └── references/
+│           └── metrics-framework.md
+├── DESIGN.md                       ← Full design doc
+├── CONTEXT.md                      ← Domain glossary
+├── ARCHITECTURE.md                 ← This file
+├── AGENTS.md                       ← Agent session context
+├── README.md                       ← Install guide
+├── LICENSE                         ← MIT
 ├── .gitignore
-└── glean-site/                    ← Next.js marketing site
+└── glean-site/                     ← Next.js marketing site
 ```
 
 ## Skill Architecture
 
-### The CMO Meta-Skill
-
-Glean ships with ONE skill: the CMO. It does not do outreach itself — it builds the skills that do.
+### The 7 Skills
 
 ```
-┌─────────────────────────────────────┐
-│          glean (CMO)                │
-│  Understands business               │
-│  Picks channels                     │
-│  Generates skills                   │
-│  Reviews results                    │
-│  Adjusts strategy                   │
-└──────────┬──────────────────────────┘
-           │ generates
-     ┌─────┼─────┬──────┬──────┐
-     ▼     ▼     ▼      ▼      ▼
- ┌──────┐ ┌──┐ ┌─────┐ ┌────┐ ┌──────┐
- │Linked│ │ X│ │Email│ │Maps│ │ custom│
- │ -in  │ │  │ │     │ │    │ │ ...   │
- └──────┘ └──┘ └─────┘ └────┘ └──────┘
-           ↑
-     Generated skills — user can
-     edit, delete, or regenerate
+┌──────────────┐
+│ glean-setup  │ ← Learn about business
+└──────┬───────┘
+       │ writes profile, audience, strategy
+       ▼
+┌──────────────┐     ┌────────────────┐
+│  glean-find  │────▶│  glean-reach   │
+│ Find leads   │     │ Send outreach  │
+└──────┬───────┘     └───────┬────────┘
+       │                     │
+       ▼                     ▼
+┌──────────────┐     ┌────────────────┐
+│glean-content │     │glean-community │
+│ Write posts  │     │ Engage Reddit  │
+└──────────────┘     └────────────────┘
+       │                     │
+       ▼                     ▼
+┌──────────────┐     ┌────────────────┐
+│ glean-track  │────▶│  glean-review  │
+│ Show status  │     │ Analyze results│
+└──────────────┘     └───────┬────────┘
+                             │
+                             ▼
+                      Updates strategy
+                      Cycle repeats
 ```
 
-### How Skills Get Generated
+### Skill Design
 
-1. CMO reads `./glean-data/profile.md` (what you sell, who you target)
-2. CMO reads `./glean-data/target-audience.md` (refined ICP)
-3. CMO reads `./glean-data/strategy.md` (current plan)
-4. CMO researches the platform if needed (web search)
-5. CMO generates SKILL.md following agentskills.io format
-6. CMO installs to user's chosen skills directory (`.agents/skills/` or agent-specific)
-7. If agent supports commands, CMO can create commands for frequently-used workflows
-
-### Generated Skill Structure
-
-Every generated skill follows this pattern:
+Each skill follows the same pattern:
 
 ```
-glean-<platform>-<purpose>/
-├── SKILL.md              ← Main instructions
-├── references/           ← Optional: detailed guides
-├── scripts/              ← Optional: helper scripts
-└── assets/               ← Optional: templates
+skill-name/
+├── SKILL.md              ← Main instructions (~50 lines)
+├── references/           ← Detailed workflows (loaded on demand)
+└── assets/               ← Templates (if needed)
 ```
 
-### Skill Chaining
+**SKILL.md contains:**
+- Trigger: when to activate
+- Behavior: what to do step by step
+- Files read: what data it needs
+- Files written: what data it produces
+- Confirmation gate: what needs approval
 
-Generated skills can reference other skills. For complex workflows, the CMO creates an orchestrator skill that chains multiple platform skills together. Example: "Find leads on LinkedIn → verify emails → send outreach."
+**References contain:**
+- Platform-specific workflows
+- BrowserAct commands
+- Templates and examples
+
+### Human in the Loop
+
+Every skill that does browser work has a confirmation gate:
+
+```
+1. Agent reads data
+2. Agent proposes action: "Found 20 leads. Want me to send outreach?"
+3. Agent shows preview: "Here are the messages I'll send:"
+4. Founder approves or modifies
+5. Agent executes
+6. Agent reports results
+```
+
+**Rule: Agent NEVER acts without founder approval.**
 
 ## Data Model
 
@@ -111,51 +160,52 @@ Generated skills can reference other skills. For complex workflows, the CMO crea
 
 ```
 ./glean-data/
-├── profile.md              ← User's business identity
-├── target-audience.md      ← ICP, evolves over time
-├── strategy.md             ← Current marketing strategy
-├── campaigns/
-│   └── <platform>/
-│       └── leads.csv       ← Per-platform lead data
+├── profile.md              ← What you sell, who for, pricing
+├── target-audience.md      ← Who to find, where they hang out
+├── strategy.md             ← Channels, messaging, goals
+├── leads.csv               ← Every lead, every field
+└── content/                ← Drafts for posts, articles, threads
+    └── <date>-<topic>.md
 ```
 
 ### Profile
 
-Contains: what you sell, who you sell to, your voice, your tools, your stage.
+Contains: what you sell, who you sell to, your tone, your website, what you've tried.
 
 ### Target Audience
 
-Contains: roles, industries, company sizes, where to find them, what they care about, outreach approach.
+Contains: titles, industries, company size, where they hang out, their pain, outreach approach.
 
 ### Strategy
 
-Contains: active channels, current focus, what's working, what's not, next actions.
+Contains: channels, priority order, messaging angle, goals, status.
 
 ### CSV Schema
 
 ```
-id,name,title,company,industry,linkedin_url,x_handle,email,stage,score,source,platform,tags,notes,first_contact,last_followup,next_followup
+id,name,title,company,industry,linkedin_url,x_handle,email,source,platform,stage,score,tags,notes,first_contact,last_followup,next_followup,last_message
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | int | Auto-incrementing ID |
 | `name` | string | Lead name |
-| `title` | string | Job title or business category |
+| `title` | string | Job title |
 | `company` | string | Company name |
 | `industry` | string | Industry |
 | `linkedin_url` | string | LinkedIn profile URL |
 | `x_handle` | string | X/Twitter handle |
 | `email` | string | Email address |
-| `stage` | enum | `discovered` → `contacted` → `replied` → `meeting_booked` → `converted` → `dead` |
-| `score` | int | Lead score (0-100) |
 | `source` | string | How the lead was found |
-| `platform` | enum | `linkedin`, `x`, `email`, `gmaps` |
+| `platform` | string | Which channel |
+| `stage` | enum | Pipeline stage |
+| `score` | int | Fit score (0-100) |
 | `tags` | string | Comma-separated tags |
-| `notes` | string | Outreach notes |
+| `notes` | string | Context notes |
 | `first_contact` | date | Date of first outreach |
 | `last_followup` | date | Date of most recent follow-up |
-| `next_followup` | date | Scheduled next follow-up date |
+| `next_followup` | date | Scheduled next follow-up |
+| `last_message` | string | Exact message sent |
 
 ### Stages
 
@@ -168,58 +218,14 @@ id,name,title,company,industry,linkedin_url,x_handle,email,stage,score,source,pl
 | `converted` | Deal won | Move to customer track |
 | `dead` | No longer pursuing | No further action |
 
-## Platform Detection
-
-The CMO detects the agent platform by asking the agent. Every agent knows what it is from its system prompt. The CMO then:
-
-1. Determines where to install generated skills (`.agents/skills/` universal or agent-specific directory)
-2. Checks if the agent supports commands (if yes, creates them for frequently-used workflows)
-3. Adapts generated skill instructions to the agent's capabilities
-
-## CMO Lifecycle
-
-```
-┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
-│  Setup   │────▶│ Generate │────▶│ Execute  │────▶│ Adjust   │
-│          │     │          │     │          │     │          │
-│ Learn    │     │ Build    │     │ Run      │     │ Review   │
-│ business │     │ skills   │     │ outreach │     │ results  │
-│ strategy │     │ install  │     │ track    │     │ iterate  │
-└──────────┘     └──────────┘     └──────────┘     └──────────┘
-     ▲                                                     │
-     └─────────────────────────────────────────────────────┘
-                        Re-run setup anytime
-```
-
 ## Tech Choices
 
 | Decision | Choice | Why |
 |----------|--------|-----|
-| Architecture | Single CMO meta-skill | Fixed skills break for different businesses |
-| Skill generation | Runtime, per-user | Each user gets tailored skills |
-| Distribution | `npx skills add` | Works across 67+ agents |
-| Skills format | agentskills.io standard | Universal, portable |
-| Browser | BrowserAct (chrome-direct) | Uses user's Chrome, no extra setup |
-| Data storage | Local CSV + markdown | Simple, zero infra, git-trackable |
-| Agent detection | Ask the agent | Agent knows what it is |
-| Commands | Optional, agent-dependent | Only if agent supports them |
-
-## Roadmap
-
-### Phase 1 — Current (v2.0)
-- CMO meta-skill with full setup flow
-- Generated skills for LinkedIn, X, Email, Google Maps
-- Marketing playbooks by business stage
-- Platform detection and skill installation
-
-### Phase 2 — Enhancement (v2.1)
-- Multi-skill orchestrator workflows
-- Command generation for supported agents
-- Campaign analytics and reporting
-- Strategy adjustment recommendations
-
-### Phase 3 — Scale (v3.0)
-- Plugin generation for agents that support it
-- MCP integrations (HubSpot, etc.)
-- Automated campaign execution
-- Community-generated skill templates
+| Architecture | 7 composable skills | Small, focused, chains naturally |
+| Skill format | agentskills.io standard | Universal, works across 67+ agents |
+| Browser | BrowserAct (chrome-direct) | Uses founder's Chrome, anti-detection |
+| Data storage | Local markdown + CSV | Simple, zero infra, git-trackable |
+| State management | File-based | Persists between sessions, human-readable |
+| Human loop | Confirmation gates | Founder always approves before action |
+| Distribution | `npx skills add` | Works across all major agents |

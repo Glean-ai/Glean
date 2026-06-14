@@ -16,46 +16,29 @@ Single-context — one CONTEXT.md + docs/adr/ at the repo root. See `docs/agents
 
 ## Current State
 
-Glean v2.0 — CMO meta-skill architecture. Single skill that generates other skills. No fixed platform skills.
+Glean v3.0 — 7-skill RevOps framework. Composable skills that handle all front-side revenue operations for technical founders with zero customers.
 
-## Session History
+## Architecture
 
-### Session 1 — Initial Build (v1.0)
-- Created 6 skills: glean, linkedin-outreach, x-outreach, email-outreach, gmaps-outreach, browser-act
-- Set up BrowserAct CLI, chrome-direct browser
-- Wrote ICP template, CSV template
-- Published to GitHub
+7 composable skills. Each does ONE thing. Skills chain naturally. Founder is always in control.
 
-### Session 2 — Cleanup & Polish
-- Switched paths from `~/glean/` to `./glean-data/`
-- Rewrote README, created glean-site directory
-- Committed and pushed
-
-### Session 3 — Website Planning
-- Created ARCHITECTURE.md, AGENTS.md
-- Designed multi-page Next.js site
-
-### Session 4 — CMO Refactor (v2.0)
-- Killed all fixed platform skills
-- Redesigned as single CMO meta-skill
-- Agent generates skills at runtime based on user's business
-- Skills follow agentskills.io standard
-- Created: references (marketing-playbooks, platform-guides, skills-format)
-- Created: assets (profile-template, audience-template, skill-template)
-- Updated CONTEXT.md with domain glossary
+```
+glean-setup → glean-find → glean-reach → glean-track → glean-review
+                    ↓              ↓
+            glean-content   glean-community
+```
 
 ## Key Decisions
 
 | Decision | Choice | Reason |
 |----------|--------|--------|
-| Architecture | Single CMO meta-skill | Fixed skills break for different businesses. CMO adapts. |
-| Skill generation | Runtime, per-user | Each user gets skills tailored to their product and audience |
-| Data path | `./glean-data/` | Relative, project-scoped, works across agents |
-| Browser | chrome-direct (BrowserAct) | Uses user's running Chrome, no extra setup |
-| Distribution | `npx skills add` | Pure skills, no npm plugin, 67+ agent compatible |
-| Skills format | agentskills.io standard | Universal, works across all agents |
-| Agent detection | Ask the agent | Agent knows what it is from system prompt |
-| Plugins/MCP | Out of scope (v2) | Focus on skills first. Plugins later. |
+| Architecture | 7 composable skills | Small, focused, chains naturally |
+| Skill format | agentskills.io standard | Universal, works across 67+ agents |
+| Browser | BrowserAct (chrome-direct) | Uses founder's Chrome, anti-detection |
+| Data storage | Local markdown + CSV | Simple, zero infra, git-trackable |
+| State management | File-based | Persists between sessions, human-readable |
+| Human loop | Confirmation gates | Founder always approves before action |
+| Distribution | `npx skills add` | Works across all major agents |
 
 ## Conventions
 
@@ -65,43 +48,101 @@ Glean v2.0 — CMO meta-skill architecture. Single skill that generates other sk
 - Git commits: concise, no emoji, describe what changed
 - No comments in code files unless essential
 - No automation/cron — manual trigger only
+- SKILL.md under 50 lines — heavy content goes in references/
 
 ## Data Structure
 
 ```
 ./glean-data/
-├── profile.md              # User's business identity
-├── target-audience.md      # ICP, evolves over time
-├── strategy.md             # Current marketing strategy
-├── campaigns/
-│   └── <platform>/
-│       └── leads.csv       # Per-platform lead data
+├── profile.md              # What you sell, who for, pricing
+├── target-audience.md      # Who to find, where they hang out
+├── strategy.md             # Channels, messaging, goals
+├── leads.csv               # Every lead, every field
+└── content/                # Drafts for posts, articles, threads
+    └── <date>-<topic>.md
 ```
 
 ## Skill Structure
 
 ```
 skills/
-├── glean/                  # CMO meta-skill
-│   ├── SKILL.md            # CMO behavior
+├── glean-setup/
+│   ├── SKILL.md              # Business discovery
 │   ├── references/
-│   │   ├── marketing-playbooks.md
-│   │   ├── platform-guides.md
-│   │   └── skills-format.md
+│   │   ├── discovery-prompts.md
+│   │   └── channel-selection.md
 │   └── assets/
 │       ├── profile-template.md
 │       ├── audience-template.md
-│       └── skill-template.md
-└── browser-act/            # Browser automation (kept from v1)
-    └── SKILL.md
+│       ├── strategy-template.md
+│       └── leads-template.csv
+├── glean-find/
+│   ├── SKILL.md              # Lead discovery
+│   └── references/
+│       ├── linkedin-search.md
+│       ├── x-search.md
+│       ├── email-finder.md
+│       └── community-search.md
+├── glean-reach/
+│   ├── SKILL.md              # Send outreach
+│   └── references/
+│       ├── linkedin-messaging.md
+│       ├── email-composition.md
+│       ├── x-dm.md
+│       └── follow-up-sequences.md
+├── glean-content/
+│   ├── SKILL.md              # Write content
+│   └── references/
+│       ├── content-formats.md
+│       └── writing-tone.md
+├── glean-community/
+│   ├── SKILL.md              # Engage communities
+│   └── references/
+│       ├── reddit-workflow.md
+│       ├── hn-workflow.md
+│       └── community-rules.md
+├── glean-track/
+│   └── SKILL.md              # Pipeline status
+└── glean-review/
+    ├── SKILL.md              # Analyze results
+    └── references/
+        └── metrics-framework.md
 ```
+
+## Daily Flow
+
+```
+Founder opens agent
+    ↓
+Agent reads all files, reports status (glean-track)
+    ↓
+Founder decides what to do next
+    ↓
+Agent suggests, founder approves
+    ↓
+Agent executes with confirmation gates
+    ↓
+Agent reports results
+    ↓
+Cycle repeats
+```
+
+## Design Principles
+
+1. **Founder is always in control.** Agent proposes, founder approves.
+2. **Skills are small and composable.** Each does ONE thing. Chains naturally.
+3. **Stateful through files.** Read/write to `./glean-data/`. Persists between sessions.
+4. **Progressive disclosure.** SKILL.md is lean. References on demand.
+5. **Clear triggers.** Each skill says exactly when to use it.
+6. **Human-readable data.** Markdown and CSV. Founder can edit manually.
+7. **No overengineering.** Simple beats complex.
 
 ## Voice & Tone (for glean-site)
 
 - Minimalist, confident, developer-first
 - Short sentences. No fluff.
 - "Glean" as proper noun
-- "You" as the user/developer
+- "You" as the founder
 - Comparisons are factual, not hype-driven
 
 ## Constants
@@ -112,7 +153,7 @@ skills/
 | Repo | `Glean-ai/Glean` |
 | Install cmd | `npx skills add Glean-ai/Glean` |
 | Site dir | `glean-site/` |
-| Skill count | 2 (glean, browser-act) |
+| Skill count | 7 (setup, find, reach, content, community, track, review) |
 | Site framework | Next.js 15 + Tailwind CSS v4 |
 
 ## Deployment
@@ -121,7 +162,7 @@ skills/
 
 ## Next Tasks (Priority Order)
 
-1. Update README for v2 architecture
-2. Update ARCHITECTURE.md for v2
-3. Test the CMO skill with a real agent
-4. Update glean-site docs for v2
+1. Update README for v3 architecture
+2. Update ARCHITECTURE.md for v3
+3. Test skills with a real agent
+4. Update glean-site docs for v3
