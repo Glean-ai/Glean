@@ -7,10 +7,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 
 const navItems = [
-  { label: "Skills", href: "/#skills" },
-  { label: "How It Works", href: "/#how-it-works" },
+  { label: "Playbook", href: "/playbook" },
   { label: "Blog", href: "/blog" },
-  { label: "Docs", href: "/docs" },
+  { label: "Skills", href: "/#skills" },
 ];
 
 export default function Header() {
